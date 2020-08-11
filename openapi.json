@@ -1,0 +1,200 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Execution Plans API",
+    "description": "This is an API that is used to browse the execution plans from the different TAC environments.\n---\nUsing this API, you can retrieve the execution plans from a source, compare two EP's in two different environments, and import an EP from one environment to the other.\n",
+    "termsOfService": "http://swagger.io/terms",
+    "contact": {
+      "name": "Ralph Abou Haidar",
+      "email": "Ralph.ABOUHAIDAR@murex.com"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "{protocol}://talendesb1:8040/services/plans",
+      "variables": {
+        "protocol": {
+          "default": "http",
+          "enum": [
+            "http",
+            "https"
+          ]
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "Execution Plans"
+        ],
+        "summary": "Return all the execution plans in the specified environment",
+        "description": "By specifying the source query parameter, the execution plans in that environment are returned. If left blank, development environment is used by default.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "source",
+            "description": "The environment out of which we want to extract the EP's, encoded in B64.",
+            "schema": {
+              "type": "string",
+              "example": "aHR0cDovL3RhbGVuZHRhY2Rldjo4MDgwL29yZy50YWxlbmQuYWRtaW5pc3RyYXRvcg=="
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of execution plans in XML format.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionPlans"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No execution plans found."
+          }
+        }
+      }
+    },
+    "/{label}": {
+      "get": {
+        "tags": [
+          "Execution Plan"
+        ],
+        "summary": "Return the execution plan with label = {label}",
+        "description": "Returns the execution plan with the matching label, in the specified environment.",
+        "parameters": [
+          {
+            "name": "label",
+            "in": "path",
+            "required": true,
+            "description": "The label of the execution plan requested by the user.",
+            "schema": {
+              "type": "string",
+              "example": "EPTEST"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source",
+            "description": "The environment out of which we want to extract the EP, encoded in B64.",
+            "schema": {
+              "type": "string",
+              "example": "aHR0cDovL3RhbGVuZHRhY2Rldjo4MDgwL29yZy50YWxlbmQuYWRtaW5pc3RyYXRvcg=="
+            }
+          },
+          {
+            "in": "query",
+            "name": "importTo",
+            "description": "The destination environment to which we want to import the execution plan, encoded in B64.",
+            "schema": {
+              "type": "string",
+              "example": "aHR0cDovL3RhbGVuZHRhY3FhOjgwODAvb3JnLnRhbGVuZC5hZG1pbmlzdHJhdG9y"
+            }
+          },
+          {
+            "in": "query",
+            "name": "compareTo",
+            "description": "The destination environment to which we want to compare the execution plan with the matching label, enccoded in B64.",
+            "schema": {
+              "type": "string",
+              "example": "aHR0cDovL3RhbGVuZHRhY3FhOjgwODAvb3JnLnRhbGVuZC5hZG1pbmlzdHJhdG9y"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "If `source` only is specified: Execution Plan named {label} in XML format.\n\nIf `importTo` is specified: Success message along with the response time in XML format.\n\nIf `compareTo` is specified: Differences between the two execution plans in XML format.\n",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionPlans"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ExecutionPlan": {
+        "type": "object",
+        "properties": {
+          "execPlanTimeout": {
+            "type": "number"
+          },
+          "planParts": {
+            "type": "object",
+            "properties": {
+              "planPartId": {
+                "type": "number"
+              },
+              "planId": {
+                "type": "string"
+              },
+              "useParalle": {
+                "type": "boolean"
+              },
+              "planPartTaskId": {
+                "type": "number"
+              },
+              "childParts": {
+                "type": "object",
+                "properties": {
+                  "planPartId": {
+                    "type": "number"
+                  },
+                  "planId": {
+                    "type": "string"
+                  },
+                  "useParalle": {
+                    "type": "boolean"
+                  },
+                  "parentId": {
+                    "type": "number"
+                  },
+                  "partStatus": {
+                    "type": "string"
+                  },
+                  "partType": {
+                    "type": "string"
+                  }
+                }
+              },
+              "partStatus": {
+                "type": "string"
+              },
+              "partType": {
+                "type": "string"
+              }
+            }
+          },
+          "idQuartzJob": {
+            "type": "number"
+          },
+          "planId": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ExecutionPlans": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ExecutionPlan"
+        }
+      }
+    }
+  }
+}
