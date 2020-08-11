@@ -65,8 +65,8 @@
         "tags": [
           "Execution Plan"
         ],
-        "summary": "Return the execution plan with label = {label}",
-        "description": "Returns the execution plan with the matching label, in the specified environment.",
+        "summary": "Return the execution plan with label = {label}, with options to compare/import to different environments",
+        "description": "Returns the execution plan with the matching label, in the specified environment. Can also compare to an other execution plan with matching label in an other environment, as well as import the execution plan from one environment to an other.",
         "parameters": [
           {
             "name": "label",
